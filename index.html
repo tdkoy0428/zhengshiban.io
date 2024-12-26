@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云购商城</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <header>
+            <div class="logo">
+                <img src="https://tdkoy0428.github.io/%E4%BA%91%E8%B4%AD.png" alt="云购" class="logo-image">
+            </div>
+        </header>
+        <div class="content">
+            <div class="notice">
+                你将在云购商城中购买一款充电宝，接下来，请认真浏览商品页面。
+            </div>
+            <div class="notice">
+                提示：<br>
+                1、商品评论由购买过该商品的消费者撰写而成。<br>
+                2、可自主结束浏览，返回问卷继续作答。
+            </div>
+        </div>
+        <div class="next-page">
+            <button onclick="goToProduct()">下一页</button>
+        </div>
+    </div>
+
+    <script>
+        // 随机分配商品和版本
+        function assignProduct() {
+            // 使用访客ID来确保分配均匀
+            let visitorId = localStorage.getItem('visitorId');
+            if (!visitorId) {
+                visitorId = 'visitor_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('visitorId', visitorId);
+            }
+            
+            // 使用访客ID的哈希值来决定分组
+            let hash = 0;
+            for (let i = 0; i < visitorId.length; i++) {
+                hash = ((hash << 5) - hash) + visitorId.charCodeAt(i);
+                hash = hash & hash;
+            }
+            
+            // 确保hash为正数
+            hash = Math.abs(hash);
+            // 对4取模，得到0-3的数字，对应四个组
+            const group = hash % 4;
+            
+            // 定义所有商品和版本的配置
+            const configurations = [
+                {
+                    product: 'powerbank',
+                    version: 'original',
+                    productName: '充电宝',
+                    pageUrl: 'https://tdkoy0428.github.io/充电宝(搜索型-原始评论).html'
+                },
+                {
+                    product: 'powerbank',
+                    version: 'ai',
+                    productName: '充电宝',
+                    pageUrl: 'https://tdkoy0428.github.io/充电宝(搜索型-AI评论).html'
+                },
+                {
+                    product: 'pillow',
+                    version: 'original',
+                    productName: '枕头',
+                    pageUrl: 'https://tdkoy0428.github.io/枕头(体验型-原始评论).html'
+                },
+                {
+                    product: 'pillow',
+                    version: 'ai',
+                    productName: '枕头',
+                    pageUrl: 'https://tdkoy0428.github.io/枕头(体验型-AI评论).html'
+                }
+            ];
+            
+            return configurations[group];
+        }
+
+        // 页面加载时执行
+        window.onload = function() {
+            // 分配商品和版本
+            const assignment = assignProduct();
+
+            // 更新页面文本
+            const noticeElements = document.getElementsByClassName('notice');
+            noticeElements[0].textContent = `你将在云购商城中购买一款${assignment.productName}，接下来，请认真浏览商品页面。`;
+
+            // 根据版本更新提示文本
+            const reviewType = assignment.version === 'ai' ? 'AI评论' : '原始评论';
+            noticeElements[1].innerHTML = `提示：<br>
+            1、${assignment.version === 'ai' ? 
+                '商品评论由AI基于海量用户原始评论生成，已过滤被监测到的虚假评论等，是根据购买过该商品的消费者所撰写的真实评论而生成的总结式评论。此外，由AI总结生成的若干产品关键词也可点击查看。' : 
+                '商品评论由购买过该商品的消费者撰写而成。'}<br>
+            2、可自主结束浏览，返回问卷继续作答。`;
+
+            // 存储分配结果
+            localStorage.setItem('assignment', JSON.stringify(assignment));
+        };
+
+        // 跳转到商品页面
+        function goToProduct() {
+            const assignment = JSON.parse(localStorage.getItem('assignment'));
+            window.location.href = assignment.pageUrl;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+    color: #333;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#app {
+    flex: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    background: white;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* 头部样式 */
+header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px 0;
+}
+
+.logo {
+    margin-bottom: 20px;
+}
+
+.logo-image {
+    width: 120px;
+    height: auto;
+    margin: 0 auto;
+}
+
+/* 内容区域 */
+.content {
+    padding: 20px;
+    background: white;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.notice {
+    margin: 25px 0;
+    line-height: 1.8;
+    font-size: 16px;
+    color: #2c3e50;
+    padding: 0 15px;
+}
+
+.notice:first-child {
+    font-size: 18px;
+    font-weight: 500;
+    color: #1a73e8;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 下一页按钮 */
+.next-page {
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+}
+
+.next-page button {
+    padding: 12px 40px;
+    border: none;
+    background: #1a73e8;
+    color: white;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(26, 115, 232, 0.3);
+}
+
+.next-page button:hover {
+    background: #1557b0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+}
+
+/* 访客ID样式 */
+#visitor-id {
+    text-align: center;
+    margin-top: 30px;
+    font-family: monospace;
+    color: #666;
+    font-size: 14px;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+    body {
+        background-color: white;
+    }
+
+    #app {
+        padding: 15px;
+        box-shadow: none;
+    }
+
+    .content {
+        padding: 15px 10px;
+    }
+
+    .notice {
+        font-size: 15px;
+        padding: 0 10px;
+    }
+
+    .notice:first-child {
+        font-size: 17px;
+    }
+
+    .next-page button {
+        width: 80%;
+        max-width: 300px;
+    }
+
+    .logo-image {
+        width: 100px;
+    }
+} 
