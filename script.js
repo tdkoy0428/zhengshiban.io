@@ -170,3 +170,57 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     `;
 });
+
+// 添加移动端优化相关的函数
+function initMobileOptimizations() {
+    // 添加返回顶部按钮
+    const backToTopButton = document.createElement('div');
+    backToTopButton.className = 'back-to-top';
+    backToTopButton.innerHTML = '↑';
+    backToTopButton.style.display = 'none';
+    document.body.appendChild(backToTopButton);
+
+    // 监听滚动事件
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopButton.style.display = 'flex';
+        } else {
+            backToTopButton.style.display = 'none';
+        }
+    });
+
+    // 返回顶部点击事件
+    backToTopButton.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // 优化图片加载
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.loading = 'lazy'; // 启用懒加载
+        
+        // 添加加载失败处理
+        img.onerror = function() {
+            this.src = 'placeholder.jpg'; // 设置默认图片
+        };
+    });
+
+    // 添加触摸反馈
+    document.querySelectorAll('button, .review-item').forEach(element => {
+        element.addEventListener('touchstart', function() {
+            this.style.opacity = '0.7';
+        });
+        
+        element.addEventListener('touchend', function() {
+            this.style.opacity = '1';
+        });
+    });
+}
+
+// 在页面加载完成后初始化移动端优化
+document.addEventListener('DOMContentLoaded', () => {
+    initMobileOptimizations();
+});
