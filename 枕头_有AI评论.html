@@ -338,7 +338,29 @@ if (typeof ues === 'function') {
   ues('ctb', 'portal-bb', 1);
 }
 </script>
-</link></link></link></head><!-- sp:end-feature:head-close -->
+</link></link></link>
+    <style>
+    .return-survey-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #888888;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 9999;
+        font-family: "Amazon Ember", Arial, sans-serif;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background-color 0.3s;
+    }
+    
+    .return-survey-btn:hover {
+        background-color: #666666;
+    }
+    </style>
+    </head><!-- sp:end-feature:head-close -->
 <!-- sp:feature:start-body -->
 <body class="a-m-us a-aui_72554-c a-aui_a11y_6_837773-t2 a-aui_killswitch_csa_logger_372963-t1 a-aui_pci_risk_banner_210084-c a-aui_template_weblab_cache_333406-c a-aui_tnr_v2_180836-c a-bw_aui_cxc_alert_measurement_1074111-c"><div id="a-page"><script data-a-state='{"key":"a-wlab-states"}' type="a-state">{"AUI_A11Y_6_837773":"T2","AUI_TNR_V2_180836":"C","AUI_TEMPLATE_WEBLAB_CACHE_333406":"C","BW_AUI_CXC_ALERT_MEASUREMENT_1074111":"C","AUI_72554":"C","AUI_KILLSWITCH_CSA_LOGGER_372963":"T1","AUI_PCI_RISK_BANNER_210084":"C"}</script><script>typeof uex === 'function' && uex('ld', 'portal-bb', {wb: 1})</script><!-- sp:end-feature:start-body -->
 <!-- sp:feature:csm:body-open -->
@@ -5382,7 +5404,41 @@ rx.ex64("UlgBKScmUURCJ1ddJCS4MxUpLUFKRlBIQEtRBSUkJ7gzFSknUEAFJSQmFSkmUEBdBSVkIXU
 </noscript>
 <script>window.ue && ue.count && ue.count('CSMLibrarySize', 78891)</script>
 <!-- sp:end-feature:csm:body-close -->
-</body></html>
+
+    
+    
+    
+    <script>
+    function returnToSurvey() {
+        // 关闭当前窗口和所有父窗口
+        try {
+            // 获取所有需要关闭的窗口引用
+            let windowsToClose = [];
+            let currentWindow = window;
+            
+            // 收集所有窗口引用
+            while (currentWindow) {
+                windowsToClose.push(currentWindow);
+                currentWindow = currentWindow.opener;
+            }
+            
+            // 从最后一个窗口开始关闭（从子窗口到父窗口）
+            for (let i = 0; i < windowsToClose.length; i++) {
+                windowsToClose[i].close();
+            }
+        } catch (e) {
+            console.log("关闭窗口时出错:", e);
+            // 如果出错，至少尝试关闭当前窗口
+            window.close();
+        }
+    }
+    </script>
+    
+    
+    
+    
+    <button class="return-survey-btn" onclick="returnToSurvey()">返回问卷</button>
+    </body></html>
 <!--       _
        .__(.)< (MEOW)
         \___)   

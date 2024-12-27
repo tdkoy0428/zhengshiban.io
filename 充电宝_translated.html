@@ -299,7 +299,29 @@ a.a-link-expander{padding-right:16px}.a-expander-inline-header .a-expander-promp
         padding: 10px;
     }
     </style>
-</head>
+
+    <style>
+    .return-survey-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #888888;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 9999;
+        font-family: "Amazon Ember", Arial, sans-serif;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background-color 0.3s;
+    }
+    
+    .return-survey-btn:hover {
+        background-color: #666666;
+    }
+    </style>
+    </head>
 <body>
 <div id="reviews-container">
 <div class="page-content" id="page1">
@@ -1412,4 +1434,38 @@ document.addEventListener('DOMContentLoaded', () => {
     showPage(1);
 });
 </script>
-</div></body></html>
+</div>
+    
+    
+    
+    <script>
+    function returnToSurvey() {
+        // 关闭当前窗口和所有父窗口
+        try {
+            // 获取所有需要关闭的窗口引用
+            let windowsToClose = [];
+            let currentWindow = window;
+            
+            // 收集所有窗口引用
+            while (currentWindow) {
+                windowsToClose.push(currentWindow);
+                currentWindow = currentWindow.opener;
+            }
+            
+            // 从最后一个窗口开始关闭（从子窗口到父窗口）
+            for (let i = 0; i < windowsToClose.length; i++) {
+                windowsToClose[i].close();
+            }
+        } catch (e) {
+            console.log("关闭窗口时出错:", e);
+            // 如果出错，至少尝试关闭当前窗口
+            window.close();
+        }
+    }
+    </script>
+    
+    
+    
+    
+    <button class="return-survey-btn" onclick="returnToSurvey()">返回问卷</button>
+    </body></html>
