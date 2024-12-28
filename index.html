@@ -95,7 +95,7 @@
             const reviewType = assignment.version === 'ai' ? 'AI评论' : '原始评论';
             noticeElements[1].innerHTML = `提示：<br>
             1、${assignment.version === 'ai' ? 
-                '商品评论由AI基于海量用户原始评论生成，已过滤被监测到的虚假评论等，是根据购买过该商品的消费者所撰写的真实评论而生成的总结论。此外，由AI总结生成的若干产品关键词也可点击查看。' : 
+                '商品评论AI基于海量用户原始评论生成，已过滤被监测到的虚假评论等，是根据购买过该商品的消费者所撰写的真实评论而生成的总结论。此外，由AI总结生成的若干产品关键词也可点击查看。' : 
                 '商品评论由购买过该商品的消费者撰写而成。'}<br>
             2、可自主结束浏览，返回问卷继续作答。`;
 
@@ -103,16 +103,31 @@
             localStorage.setItem('assignment', JSON.stringify(assignment));
         };
 
-        // 跳转到商品页面
-        function goToProduct() {
+        // 检测是否在微信浏览器中
+        function isWeixinBrowser() {
+            return /MicroMessenger/i.test(navigator.userAgent);
+        }
+
+        // 在 goToProduct 函数前添加
+        function openInWeixin(url) {
+            // 尝试直接在当前页面打开
             try {
-                const assignment = JSON.parse(localStorage.getItem('assignment'));
-                // 使用完整的URL路径
-                const url = assignment.pageUrl;
                 window.location.href = url;
-            } catch (error) {
-                console.error('跳转失败:', error);
-                alert('页面跳转出现问题，请重试');
+            } catch(e) {
+                // 如果失败，尝试使用 window.open
+                window.open(url, '_self');
+            }
+        }
+
+        // 修改 goToProduct 函数
+        function goToProduct() {
+            const assignment = JSON.parse(localStorage.getItem('assignment'));
+            if (isWeixinBrowser()) {
+                // 在微信中特殊处理
+                openInWeixin(assignment.pageUrl);
+            } else {
+                // 保持原有行为不变
+                window.open(assignment.pageUrl, '_blank');
             }
         }
     </script>
