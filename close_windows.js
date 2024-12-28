@@ -15,8 +15,11 @@ if (window.opener) {
 registerWindow(window);
 
 function closeAllWindows() {
-    // 检测是否为移动设备
+    // 检测浏览器环境
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isAndroid = /Android/i.test(navigator.userAgent);
     
     // 尝试关闭所有已注册的窗口
     for (let win of openedWindows) {
@@ -29,49 +32,109 @@ function closeAllWindows() {
         }
     }
 
-    // 针对当前窗口的关闭尝试
-    try {
-        // 标准关闭方法
-        window.close();
-        
-        // 如果有历史记录，尝试返回
-        if (window.history.length > 1) {
-            window.history.go(-1);
-            return;
+    // 定义一个函数来检查页面是否真的被关闭
+    const isPageVisible = () => document.visibilityState !== 'hidden';
+
+    // 定义一个函数来尝试所有可能的关闭方法
+    const tryAllCloseMethods = async () => {
+        // 1. 尝试直接关闭
+        try {
+            window.close();
+            window.top.close();
+        } catch (e) {
+            console.log('Direct close failed:', e);
         }
 
-        // 尝试重定向到空白页面
-        window.location.href = 'about:blank';
-        
-        // 强制重载到空白状态
-        setTimeout(() => {
-            window.location.replace('about:blank');
-        }, 100);
-        
-    } catch (e) {
-        console.log('Error during close attempts:', e);
-    }
-    
-    // 显示设备特定的提示信息
-    setTimeout(() => {
-        if (document.body) {
-            if (isMobile) {
-                document.body.innerHTML = `
-                    <div style="text-align: center; padding: 20px; font-size: 18px;">
-                        <p>请使用以下方法之一关闭页面：</p>
-                        <p>1. 点击浏览器左上角的返回按钮 ←</p>
-                        <p>2. 点击浏览器的标签页按钮，然后关闭当前标签</p>
-                        <p>3. 使用系统返回手势</p>
-                    </div>`;
-            } else {
-                document.body.innerHTML = '<div style="text-align: center; padding: 20px;"><p>请关闭此标签页</p></div>';
+        // 2. 尝试返回
+        if (window.history && window.history.length > 1) {
+            try {
+                window.history.back();
+                window.history.go(-1);
+            } catch (e) {
+                console.log('History back failed:', e);
             }
         }
-    }, 200);
+
+        // 3. 尝试改变location
+        try {
+            if (isPageVisible()) {
+                window.location.replace('about:blank');
+            }
+        } catch (e) {
+            console.log('Location replace failed:', e);
+        }
+
+        // 4. 针对特定浏览器的处理
+        if (isWechat) {
+            try {
+                WeixinJSBridge.call('closeWindow');
+            } catch (e) {
+                console.log('WeixinJSBridge close failed:', e);
+            }
+        }
+
+        // 5. 使用pushState清空历史
+        try {
+            window.history.pushState(null, '', 'about:blank');
+            window.history.replaceState(null, '', 'about:blank');
+        } catch (e) {
+            console.log('History state change failed:', e);
+        }
+    };
+
+    // 执行所有关闭方法
+    tryAllCloseMethods();
+
+    // 如果3秒后页面还在，显示提示信息
+    setTimeout(() => {
+        if (isPageVisible()) {
+            const closeMessage = document.createElement('div');
+            closeMessage.style.position = 'fixed';
+            closeMessage.style.top = '0';
+            closeMessage.style.left = '0';
+            closeMessage.style.width = '100%';
+            closeMessage.style.height = '100%';
+            closeMessage.style.backgroundColor = 'white';
+            closeMessage.style.zIndex = '999999';
+            closeMessage.style.display = 'flex';
+            closeMessage.style.flexDirection = 'column';
+            closeMessage.style.justifyContent = 'center';
+            closeMessage.style.alignItems = 'center';
+            closeMessage.style.padding = '20px';
+            closeMessage.style.boxSizing = 'border-box';
+
+            if (isMobile) {
+                const browserType = isIOS ? 'iOS' : isAndroid ? 'Android' : '移动';
+                closeMessage.innerHTML = `
+                    <div style="text-align: center; max-width: 600px;">
+                        <h2 style="color: #333; margin-bottom: 20px;">请选择以下方式关闭页面</h2>
+                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 10px 0;">
+                            <p style="color: #007bff; margin: 15px 0; font-size: 18px;">① ${browserType}返回手势</p>
+                            <p style="color: #007bff; margin: 15px 0; font-size: 18px;">② 点击浏览器的返回按钮</p>
+                            <p style="color: #007bff; margin: 15px 0; font-size: 18px;">③ 关闭当前标签页</p>
+                        </div>
+                        <button onclick="window.history.back()" style="margin-top: 20px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 16px;">点击返回</button>
+                    </div>`;
+            } else {
+                closeMessage.innerHTML = `
+                    <div style="text-align: center;">
+                        <h2 style="color: #333; margin-bottom: 20px;">请手动关闭此标签页</h2>
+                        <p style="color: #666;">您可以按下 Ctrl+W (Windows) 或 Command+W (Mac) 关闭此标签页</p>
+                    </div>`;
+            }
+
+            document.body.appendChild(closeMessage);
+        }
+    }, 300);
 }
 
 // Add return button to the page
 function addReturnButton() {
+    // 检查当前页面URL是否包含"index"，如果是则不添加按钮
+    if (window.location.pathname.toLowerCase().includes('index')) {
+        return;
+    }
+    
     // Create the button element
     var button = document.createElement('button');
     button.innerHTML = '返回问卷';
@@ -92,8 +155,8 @@ function addReturnButton() {
     button.style.borderRadius = '5px';
     button.style.cursor = 'pointer';
     button.style.zIndex = '9999';
-    button.style.fontSize = '16px'; // 增大字体使在手机上更容易点击
-    button.style.minWidth = '120px'; // 确保按钮足够大，便于在手机上点击
+    button.style.fontSize = '16px';
+    button.style.minWidth = '120px';
     
     // Add hover effect
     button.onmouseover = function() {
