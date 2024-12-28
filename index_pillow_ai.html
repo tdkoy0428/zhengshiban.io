@@ -70,30 +70,16 @@
             win.document.body.appendChild(button);
         }
 
-        function isWeixinBrowser() {
-            return /MicroMessenger/i.test(navigator.userAgent);
-        }
-
-        function openInWeixin(url) {
-            try {
-                window.location.href = url;
-            } catch(e) {
-                window.open(url, '_self');
-            }
-        }
-
         function goToProduct() {
-            if (isWeixinBrowser()) {
-                // 在微信中特殊处理
-                openInWeixin('枕头_有AI评论.html');
-            } else {
-                // 保持原有行为不变
-                var productWindow = window.open('枕头_有AI评论.html', '_blank');
-                productWindow.onload = function() {
-                    addReturnButton(productWindow);
-                };
-                window.close();
-            }
+            var productWindow = window.open('枕头_有AI评论.html', '_blank');
+            
+            // Add return button to the product window
+            productWindow.onload = function() {
+                addReturnButton(productWindow);
+            };
+
+            // Close the current window
+            window.close();
         }
     </script>
 </body>
