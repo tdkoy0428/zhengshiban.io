@@ -1,14 +1,13 @@
-// Keep track of opened windows
 let openedWindows = [];
 
-// Function to register new window
+// Register the current window
 function registerWindow(win) {
     if (win && !openedWindows.includes(win)) {
         openedWindows.push(win);
     }
 }
 
-// Register the current window when the script loads
+// Register the current window and its opener if available
 if (window.opener) {
     registerWindow(window.opener);
 }
@@ -20,8 +19,8 @@ function closeAllWindows() {
     const isWechat = /MicroMessenger/i.test(navigator.userAgent);
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
-    
-    // 尝试关闭所有已注册的窗口
+
+    // Try to close all opened windows
     for (let win of openedWindows) {
         try {
             if (win && !win.closed) {
@@ -32,12 +31,12 @@ function closeAllWindows() {
         }
     }
 
-    // 定义一个函数来检查页面是否真的被关闭
+    // Define a function to check if the page is visible
     const isPageVisible = () => document.visibilityState !== 'hidden';
 
-    // 定义一个函数来尝试所有可能的关闭方法
+    // Function to try all close methods
     const tryAllCloseMethods = async () => {
-        // 1. 尝试直接关闭
+        // 1. Attempt direct close
         try {
             window.close();
             window.top.close();
@@ -45,7 +44,7 @@ function closeAllWindows() {
             console.log('Direct close failed:', e);
         }
 
-        // 2. 尝试返回
+        // 2. Try going back in history
         if (window.history && window.history.length > 1) {
             try {
                 window.history.back();
@@ -55,16 +54,16 @@ function closeAllWindows() {
             }
         }
 
-        // 3. 尝试改变location
+        // 3. Try changing location to force reload or blank page
         try {
             if (isPageVisible()) {
-                window.location.replace('about:blank');
+                window.location.replace('about:blank');  // Redirect to a blank page
             }
         } catch (e) {
             console.log('Location replace failed:', e);
         }
 
-        // 4. 针对特定浏览器的处理
+        // 4. Special handling for WeChat
         if (isWechat) {
             try {
                 WeixinJSBridge.call('closeWindow');
@@ -73,7 +72,7 @@ function closeAllWindows() {
             }
         }
 
-        // 5. 使用pushState清空历史
+        // 5. Clear history using pushState
         try {
             window.history.pushState(null, '', 'about:blank');
             window.history.replaceState(null, '', 'about:blank');
@@ -82,10 +81,10 @@ function closeAllWindows() {
         }
     };
 
-    // 执行所有关闭方法
+    // Execute all close methods
     tryAllCloseMethods();
 
-    // 如果3秒后页面还在，显示提示信息
+    // If page is still open after 3 seconds, show a message
     setTimeout(() => {
         if (isPageVisible()) {
             const closeMessage = document.createElement('div');
@@ -181,4 +180,4 @@ function addReturnButton() {
 // Add the return button when the page loads
 window.onload = function() {
     addReturnButton();
-}; 
+};
