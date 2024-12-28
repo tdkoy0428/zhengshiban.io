@@ -74,12 +74,20 @@
             return /MicroMessenger/i.test(navigator.userAgent);
         }
 
+        function openInWeixin(url) {
+            try {
+                window.location.href = url;
+            } catch(e) {
+                window.open(url, '_self');
+            }
+        }
+
         function goToProduct() {
             if (isWeixinBrowser()) {
-                // 在微信中使用 location.href，并且不关闭当前窗口
-                window.location.href = '枕头_有AI评论.html';
+                // 在微信中特殊处理
+                openInWeixin('枕头_有AI评论.html');
             } else {
-                // 其他浏览器保持原有行为
+                // 保持原有行为不变
                 var productWindow = window.open('枕头_有AI评论.html', '_blank');
                 productWindow.onload = function() {
                     addReturnButton(productWindow);
