@@ -57,25 +57,25 @@
                     product: 'powerbank',
                     version: 'original',
                     productName: '充电宝',
-                    pageUrl: '充电宝-原始评论-无AI评论.html'
+                    pageUrl: 'https://tdkoy0428.github.io/充电宝-原始评论-无AI评论.html'
                 },
                 {
                     product: 'powerbank',
                     version: 'ai',
                     productName: '充电宝',
-                    pageUrl: '充电宝-有AI评论.html'
+                    pageUrl: 'https://tdkoy0428.github.io/充电宝-有AI评论.html'
                 },
                 {
                     product: 'pillow',
                     version: 'original',
                     productName: '枕头',
-                    pageUrl: '枕头-原始评论-无AI评论.html'
+                    pageUrl: 'https://tdkoy0428.github.io/枕头-原始评论-无AI评论.html'
                 },
                 {
                     product: 'pillow',
                     version: 'ai',
                     productName: '枕头',
-                    pageUrl: '枕头_有AI评论.html'
+                    pageUrl: 'https://tdkoy0428.github.io/枕头_有AI评论.html'
                 }
             ];
             
@@ -95,7 +95,7 @@
             const reviewType = assignment.version === 'ai' ? 'AI评论' : '原始评论';
             noticeElements[1].innerHTML = `提示：<br>
             1、${assignment.version === 'ai' ? 
-                '商品评论由AI基于海量用户原始评论生成，已过滤被监测到的虚假评论等，是根据购买过该商品的消费者所撰写的真实评论而生成的总结��论。此外，由AI总结生成的若干产品关键词也可点击查看。' : 
+                '商品评论由AI基于海量用户原始评论生成，已过滤被监测到的虚假评论等，是根据购买过该商品的消费者所撰写的真实评论而生成的总结论。此外，由AI总结生成的若干产品关键词也可点击查看。' : 
                 '商品评论由购买过该商品的消费者撰写而成。'}<br>
             2、可自主结束浏览，返回问卷继续作答。`;
 
@@ -105,8 +105,15 @@
 
         // 跳转到商品页面
         function goToProduct() {
-            const assignment = JSON.parse(localStorage.getItem('assignment'));
-            window.location.href = assignment.pageUrl;
+            try {
+                const assignment = JSON.parse(localStorage.getItem('assignment'));
+                // 使用完整的URL路径
+                const url = assignment.pageUrl;
+                window.location.href = url;
+            } catch (error) {
+                console.error('跳转失败:', error);
+                alert('页面跳转出现问题，请重试');
+            }
         }
     </script>
 </body>
