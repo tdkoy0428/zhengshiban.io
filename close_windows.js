@@ -1,11 +1,28 @@
+function isWeixinBrowser() {
+    return /MicroMessenger/i.test(navigator.userAgent);
+}
+
 function closeAllWindows() {
-    // Try to close any opener windows
-    if (window.opener && !window.opener.closed) {
-        window.opener.close();
+    if (isWeixinBrowser()) {
+        // 在微信浏览器中，尝试多种方式关闭页面
+        try {
+            WeixinJSBridge.call('closeWindow'); // 尝试使用微信 JS Bridge 关闭
+        } catch (e) {
+            try {
+                window.opener = null;
+                window.open('', '_self');
+                window.close();
+            } catch (e2) {
+                window.history.back(-1);
+            }
+        }
+    } else {
+        // 在其他浏览器中保持原有行为
+        if (window.opener && !window.opener.closed) {
+            window.opener.close();
+        }
+        window.close();
     }
-    
-    // Close the current window
-    window.close();
 }
 
 // Add return button to the page
@@ -42,4 +59,14 @@ function addReturnButton() {
 // Add the return button when the page loads
 window.onload = function() {
     addReturnButton();
+    
+    // 在微信浏览器中添加额外的关闭处理
+    if (isWeixinBrowser()) {
+        // 如果是微信浏览器，确保 WeixinJSBridge 准备就绪
+        if (typeof WeixinJSBridge == "undefined") {
+            document.addEventListener("WeixinJSBridgeReady", function() {
+                // WeixinJSBridge 初始化成功
+            }, false);
+        }
+    }
 }; 
