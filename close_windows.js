@@ -1,13 +1,13 @@
+// Keep track of opened windows
 let openedWindows = [];
 
-// Register the current window
+// Function to register new window
 function registerWindow(win) {
     if (win && !openedWindows.includes(win)) {
         openedWindows.push(win);
-    }
 }
 
-// Register the current window and its opener if available
+// Register the current window when the script loads
 if (window.opener) {
     registerWindow(window.opener);
 }
@@ -16,11 +16,11 @@ registerWindow(window);
 function closeAllWindows() {
     // 检测浏览器环境
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const isWechat = /MicroMessenger/i.test(navigator.userAgent);
+    const isWechat = /MicroMessenger/i.test(navigator.userAgent);  // 判断是否是微信
     const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
     const isAndroid = /Android/i.test(navigator.userAgent);
 
-    // Try to close all opened windows
+    // 尝试关闭所有已注册的窗口
     for (let win of openedWindows) {
         try {
             if (win && !win.closed) {
@@ -31,12 +31,12 @@ function closeAllWindows() {
         }
     }
 
-    // Define a function to check if the page is visible
+    // 定义一个函数来检查页面是否真的被关闭
     const isPageVisible = () => document.visibilityState !== 'hidden';
 
-    // Function to try all close methods
+    // 定义一个函数来尝试所有可能的关闭方法
     const tryAllCloseMethods = async () => {
-        // 1. Attempt direct close
+        // 1. 尝试直接关闭
         try {
             window.close();
             window.top.close();
@@ -44,7 +44,7 @@ function closeAllWindows() {
             console.log('Direct close failed:', e);
         }
 
-        // 2. Try going back in history
+        // 2. 尝试返回
         if (window.history && window.history.length > 1) {
             try {
                 window.history.back();
@@ -54,25 +54,25 @@ function closeAllWindows() {
             }
         }
 
-        // 3. Try changing location to force reload or blank page
+        // 3. 尝试改变location
         try {
             if (isPageVisible()) {
-                window.location.replace('about:blank');  // Redirect to a blank page
+                window.location.replace('about:blank');
             }
         } catch (e) {
             console.log('Location replace failed:', e);
         }
 
-        // 4. Special handling for WeChat
+        // 4. 针对微信浏览器的处理
         if (isWechat) {
             try {
-                WeixinJSBridge.call('closeWindow');
+                WeixinJSBridge.call('closeWindow');  // 使用微信JSBridge关闭窗口
             } catch (e) {
                 console.log('WeixinJSBridge close failed:', e);
             }
         }
 
-        // 5. Clear history using pushState
+        // 5. 使用pushState清空历史
         try {
             window.history.pushState(null, '', 'about:blank');
             window.history.replaceState(null, '', 'about:blank');
@@ -81,10 +81,10 @@ function closeAllWindows() {
         }
     };
 
-    // Execute all close methods
+    // 执行所有关闭方法
     tryAllCloseMethods();
 
-    // If page is still open after 3 seconds, show a message
+    // 如果页面3秒后仍然可见，显示提示信息
     setTimeout(() => {
         if (isPageVisible()) {
             const closeMessage = document.createElement('div');
@@ -127,23 +127,23 @@ function closeAllWindows() {
     }, 300);
 }
 
-// Add return button to the page
+// 添加返回按钮
 function addReturnButton() {
     // 检查当前页面URL是否包含"index"，如果是则不添加按钮
     if (window.location.pathname.toLowerCase().includes('index')) {
         return;
     }
-    
-    // Create the button element
+
+    // 创建按钮元素
     var button = document.createElement('button');
     button.innerHTML = '返回问卷';
-    
-    // Add click event with confirmation
+
+    // 为按钮添加点击事件
     button.onclick = function() {
         closeAllWindows();
     };
-    
-    // Style the button
+
+    // 设置按钮样式
     button.style.position = 'fixed';
     button.style.bottom = '20px';
     button.style.right = '20px';
@@ -156,28 +156,28 @@ function addReturnButton() {
     button.style.zIndex = '9999';
     button.style.fontSize = '16px';
     button.style.minWidth = '120px';
-    
-    // Add hover effect
+
+    // 按钮的 hover 效果
     button.onmouseover = function() {
         this.style.backgroundColor = '#0056b3';
     };
     button.onmouseout = function() {
         this.style.backgroundColor = '#007bff';
     };
-    
-    // Add touch effect for mobile
+
+    // 为按钮添加触摸事件（适用于移动端）
     button.addEventListener('touchstart', function() {
         this.style.backgroundColor = '#0056b3';
     });
     button.addEventListener('touchend', function() {
         this.style.backgroundColor = '#007bff';
     });
-    
-    // Add the button to the page
+
+    // 将按钮添加到页面中
     document.body.appendChild(button);
 }
 
-// Add the return button when the page loads
+// 页面加载完成时添加返回按钮
 window.onload = function() {
     addReturnButton();
-};
+}}
