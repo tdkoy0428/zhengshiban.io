@@ -71,6 +71,20 @@
         }
 
         function goToProduct() {
+<<<<<<< HEAD
+            // 检测是否在微信浏览器中
+            if (/MicroMessenger/i.test(navigator.userAgent)) {
+                // 在微信中直接跳转
+                window.location.href = '枕头-原始评论-无AI评论.html';
+            } else {
+                // 其他浏览器保持原有行为
+                var productWindow = window.open('枕头-原始评论-无AI评论.html', '_blank');
+                productWindow.onload = function() {
+                    addReturnButton(productWindow);
+                };
+                window.close();
+            }
+=======
             var productWindow = window.open('https://tdkoy0428.github.io/zhengshiban.io/枕头-原始评论-无AI评论.html', '_blank');
             
             // Add return button to the product window
@@ -80,6 +94,7 @@
 
             // Close the current window
             window.close();
+>>>>>>> 860a021b2c46c1404c2a9d7a9c541cdac951accc
         }
     </script>
 </body>
