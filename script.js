@@ -95,7 +95,43 @@ function renderProducts() {
     }
 }
 
-// 修改 handleLinkClick 函数
+// 添加设备检测函数
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+// 修改关闭窗口的函数
+function closeAllWindows() {
+    if (isMobileDevice()) {
+        // 移动端关闭处理
+        try {
+            // 尝试关闭当前窗口
+            window.close();
+            
+            // 如果window.close()不起作用，尝试返回上一页
+            if (!window.closed) {
+                window.history.back();
+            }
+            
+            // 如果还是不行，尝试重定向到空白页
+            if (!window.closed) {
+                window.location.href = "about:blank";
+            }
+        } catch (e) {
+            console.log("Fallback to alternative closing method", e);
+            // 最后的备选方案：显示提示信息
+            alert("请点击浏览器的返回按钮或关闭标签页来返回问卷");
+        }
+    } else {
+        // 保持原有的电脑端关闭逻辑
+        if (window.opener && !window.opener.closed) {
+            window.opener.close();
+        }
+        window.close();
+    }
+}
+
+// 修改handleLinkClick函数
 function handleLinkClick(productId, url) {
     if (!visitHistory.currentSession.visitTimes[productId]) {
         visitHistory.currentSession.visitTimes[productId] = 0;
@@ -106,8 +142,14 @@ function handleLinkClick(productId, url) {
 
     // 添加商品ID参数到URL
     const urlWithParams = url + '?productId=' + encodeURIComponent(productId);
-    // 在新标签页中打开链接
-    window.open(urlWithParams, '_blank');
+    
+    if (isMobileDevice()) {
+        // 移动端直接在当前窗口打开
+        window.location.href = urlWithParams;
+    } else {
+        // 电脑端保持原有的新窗口打开方式
+        window.open(urlWithParams, '_blank');
+    }
     return false;
 }
 
@@ -223,4 +265,53 @@ function initMobileOptimizations() {
 // 在页面加载完成后初始化移动端优化
 document.addEventListener('DOMContentLoaded', () => {
     initMobileOptimizations();
+});
+
+// 统一评论区布局
+function unifyReviewLayout() {
+  // 获取所有评论
+  const reviews = document.querySelectorAll('.review');
+  
+  reviews.forEach(review => {
+    // 创建统一的评论结构
+    const reviewContainer = document.createElement('div');
+    reviewContainer.className = 'review-container';
+    
+    // 提取评论数据
+    const avatar = review.querySelector('.a-profile-avatar img')?.src || '';
+    const name = review.querySelector('.a-profile-name')?.textContent || '';
+    const rating = review.querySelector('.review-rating')?.innerHTML || '';
+    const title = review.querySelector('.review-title')?.textContent || '';
+    const date = review.querySelector('.review-date')?.textContent || '';
+    const text = review.querySelector('.review-text')?.textContent || '';
+    
+    // 创建统一的HTML结构
+    reviewContainer.innerHTML = `
+      <div class="review-header">
+        <div class="review-profile">
+          <div class="review-profile-avatar">
+            <img src="${avatar}" alt="${name}" />
+          </div>
+          <div class="review-profile-info">
+            <div class="review-profile-name">${name}</div>
+            <div class="review-rating">${rating}</div>
+          </div>
+        </div>
+      </div>
+      <div class="review-content">
+        <h3 class="review-title">${title}</h3>
+        <div class="review-date">${date}</div>
+        <div class="review-text">${text}</div>
+      </div>
+    `;
+    
+    // 替换原有的评论结构
+    review.innerHTML = '';
+    review.appendChild(reviewContainer);
+  });
+}
+
+// 页面加载完成后执行
+document.addEventListener('DOMContentLoaded', function() {
+  unifyReviewLayout();
 });

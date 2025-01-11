@@ -2,6 +2,27 @@
 
 <html lang="zh">
 <head>
+  <style>
+    .return-survey-btn {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        background-color: #c41a1a;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        z-index: 9999;
+        font-family: "Amazon Ember", Arial, sans-serif;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background-color 0.3s;
+    }
+    
+    .return-survey-btn:hover {
+        background-color: #ea0e0e;
+    }
+    </style>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>评论</title>
@@ -301,26 +322,26 @@ a.a-link-expander{padding-right:16px}.a-expander-inline-header .a-expander-promp
     </style>
 
     <style>
-    .return-survey-btn {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        padding: 10px 20px;
-        background-color: #888888;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        z-index: 9999;
-        font-family: "Amazon Ember", Arial, sans-serif;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        transition: background-color 0.3s;
-    }
-    
-    .return-survey-btn:hover {
-        background-color: #666666;
-    }
-    </style>
+      .return-survey-btn {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 10px 20px;
+          background-color: #c41a1a;
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          z-index: 9999;
+          font-family: "Amazon Ember", Arial, sans-serif;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          transition: background-color 0.3s;
+      }
+      
+      .return-survey-btn:hover {
+          background-color: #ea0e0e;
+      }
+      </style>
     </head>
 <body>
 <div id="reviews-container">
@@ -1437,34 +1458,41 @@ document.addEventListener('DOMContentLoaded', () => {
 </div>
     
     
-    
-    <script>
-    function returnToSurvey() {
-        // 关闭当前窗口和所有父窗口
-        try {
-            // 获取所有需要关闭的窗口引用
-            let windowsToClose = [];
-            let currentWindow = window;
-            
-            // 收集所有窗口引用
-            while (currentWindow) {
-                windowsToClose.push(currentWindow);
-                currentWindow = currentWindow.opener;
-            }
-            
-            // 从最后一个窗口开始关闭（从子窗口到父窗口）
-            for (let i = 0; i < windowsToClose.length; i++) {
-                windowsToClose[i].close();
-            }
-        } catch (e) {
-            console.log("关闭窗口时出错:", e);
-            // 如果出错，至少尝试关闭当前窗口
-            window.close();
-        }
-    }
-    </script>
-    
-    
+<script>
+  function returnToSurvey() {
+      // 关闭所有窗口的函数
+      function closeAllWindows() {
+          // 获取所有窗口引用
+          let windowsToClose = [];
+          let currentWindow = window;
+          
+          // 收集所有窗口引用
+          while (currentWindow) {
+              windowsToClose.push(currentWindow);
+              try {
+                  // 尝试获取父窗口或打开此窗口的窗口
+                  let nextWindow = currentWindow.opener || currentWindow.parent;
+                  if (nextWindow === currentWindow) break;
+                  currentWindow = nextWindow;
+              } catch (e) {
+                  break;
+              }
+          }
+          
+          // 从最后一个窗口开始关闭
+          for (let i = windowsToClose.length - 1; i >= 0; i--) {
+              try {
+                  windowsToClose[i].close();
+              } catch (e) {
+                  console.error("关闭窗口时出错:", e);
+              }
+          }
+      }
+  
+      // 执行关闭
+      closeAllWindows();
+  }
+  </script>
     
     
     <button class="return-survey-btn" onclick="returnToSurvey()">返回问卷</button>
